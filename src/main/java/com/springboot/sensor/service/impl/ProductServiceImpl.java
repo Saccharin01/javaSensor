@@ -1,14 +1,14 @@
 package com.springboot.sensor.service.impl;
 
-import com.springboot.advanced_jpa.data.dao.ProductDAO;
-import com.springboot.advanced_jpa.data.dto.ProductDTO;
-import com.springboot.advanced_jpa.data.entity.Product;
+import com.springboot.sensor.data.dao.ProductDAO;
+import com.springboot.sensor.data.dto.ProductDTO;
+import com.springboot.sensor.data.entity.Product;
 
-import com.springboot.advanced_jpa.data.repository.QProductRepository;
+import com.springboot.sensor.data.repository.QProductRepository;
 import com.springboot.sensor.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.springboot.advanced_jpa.data.dto.ProductResponseDTO;
+import com.springboot.sensor.data.dto.ProductResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

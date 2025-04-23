@@ -1,7 +1,7 @@
 package com.springboot.sensor.controller;
 
-import com.springboot.advanced_jpa.data.entity.Product;
-import com.springboot.advanced_jpa.data.repository.support.ProductRepositorySupport;
+import com.springboot.sensor.data.entity.Product;
+import com.springboot.sensor.data.repository.support.ProductRepositorySupport;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

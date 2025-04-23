@@ -1,9 +1,9 @@
 package com.springboot.sensor.controller;
 
-import com.springboot.advanced_jpa.data.dto.ChangeProductNameDTO;
-import com.springboot.advanced_jpa.data.dto.ProductDTO;
-import com.springboot.advanced_jpa.data.dto.ProductResponseDTO;
-import com.springboot.advanced_jpa.service.ProductService;
+import com.springboot.sensor.data.dto.ChangeProductNameDTO;
+import com.springboot.sensor.data.dto.ProductDTO;
+import com.springboot.sensor.data.dto.ProductResponseDTO;
+import com.springboot.sensor.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

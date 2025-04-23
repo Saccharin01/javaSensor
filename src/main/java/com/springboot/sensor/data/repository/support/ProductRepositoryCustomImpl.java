@@ -1,7 +1,7 @@
 package com.springboot.sensor.data.repository.support;
 
-import com.springboot.advanced_jpa.data.entity.Product;
-import com.springboot.advanced_jpa.data.entity.QProduct;
+import com.springboot.sensor.data.entity.Product;
+import com.springboot.sensor.data.entity.QProduct;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
