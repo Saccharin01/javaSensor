@@ -42,6 +42,18 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+val querydslGeneratedDir = file("build/generated/querydsl")
+
+sourceSets {
+    named("main") {
+        java.srcDir(querydslGeneratedDir)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.generatedSourceOutputDirectory.set(querydslGeneratedDir)
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
