@@ -5,6 +5,9 @@ import com.springboot.sensor.data.repository.support.SensorUnitRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
-public interface SensorUnitRepository extends JpaRepository<SensorUnit, Long>,
-        QuerydslPredicateExecutor<SensorUnit>,
-        SensorUnitRepositoryCustom {}
+import java.util.Optional;
+
+public interface SensorUnitRepository extends JpaRepository<SensorUnit, Long>, QuerydslPredicateExecutor<SensorUnit>,
+        SensorUnitRepositoryCustom {
+            Optional<SensorUnit> findByChipId(String chipId);
+}
