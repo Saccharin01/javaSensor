@@ -14,13 +14,13 @@ public class SensorData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long number;
+    private Long dataId;
 
-    @Column
-    private int data;
+    @Column(name = "sensed_data", nullable = false)
+    private int sensedData;
 
-    @Column
-    private LocalDateTime sensed_time;
+    @Column(name = "sensed_time", nullable = false)
+    private LocalDateTime sensedTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_id", nullable = false)

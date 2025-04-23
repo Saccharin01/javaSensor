@@ -15,10 +15,10 @@ public class SensorUnit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long chip_pk;
+    private Long chipPk;
 
     @Column(nullable = false, unique = true)
-    private String chip_id;
+    private String chipId;
 
     @Column(nullable = false)
     private String name;

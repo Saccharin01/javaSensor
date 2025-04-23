@@ -23,8 +23,8 @@ public class SensorDataRepositoryCustomImpl implements SensorDataRepositoryCusto
 
         return queryFactory.selectFrom(data)
                 .join(data.sensorUnit, unit).fetchJoin()
-                .where(unit.chip_id.eq(chipId))
-                .orderBy(data.sensed_time.desc())
+                .where(unit.chipId.eq(chipId))
+                .orderBy(data.sensedTime.desc())
                 .limit(limit)
                 .fetch();
     }
