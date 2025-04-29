@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/sensor")
 public class SensorController {
@@ -31,5 +33,14 @@ public class SensorController {
 
         return ResponseEntity.status(HttpStatus.OK).body(sensorData);
 
+    }
+
+    @Operation(
+            summary = "센서 유닛의 id 값을 가져오는 메서드입니다.",
+            description = "테이블에 저장되어있는 센서의 id를 List<String>으로 반환합니다."
+    )
+    @GetMapping
+    public ResponseEntity<List<String>> getSensorUnitId() {
+        return ResponseEntity.ok(sensorService.getSensorUnitIds());
     }
 }
