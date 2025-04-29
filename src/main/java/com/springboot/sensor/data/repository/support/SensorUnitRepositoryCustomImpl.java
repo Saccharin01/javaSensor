@@ -88,4 +88,41 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
                 dataList
         );
     }
+
+    @Override
+    public SensorResponseDTO findSensorDataLimit(String chipId, int limit) {
+        QSensorUnit sensorUnit = QSensorUnit.sensorUnit;
+        QSensorData sensorData = QSensorData.sensorData;
+
+        // 유닛 단독 조회
+        SensorUnit unit = queryFactory
+                .selectFrom(sensorUnit)
+                .where(sensorUnit.chipId.eq(chipId))
+                .fetchOne();
+
+        if (unit == null) {
+            throw new IllegalArgumentException("SensorUnit with chipId " + chipId + " not found");
+        }
+
+        // 최근 데이터 50개만 조회
+        List<SensorData> recentData = queryFactory
+                .selectFrom(sensorData)
+                .join(sensorData.sensorUnit, sensorUnit).fetchJoin()
+                .where(sensorUnit.chipId.eq(chipId))
+                .orderBy(sensorData.sensedTime.desc())
+                .limit(limit)
+                .fetch();
+
+        // DTO 변환
+        List<SensorDataDTO> dataList = recentData.stream()
+                .map(d -> new SensorDataDTO(d.getSensedData(), d.getSensedTime()))
+                .collect(java.util.stream.Collectors.toList());
+
+        return new SensorResponseDTO(
+                unit.getChipId(),
+                unit.getName(),
+                unit.getLocation(),
+                dataList
+        );
+    }
 }
