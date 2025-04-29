@@ -12,6 +12,7 @@ public interface SensorService {
 
     List<String>getSensorUnitIds();
 
+    SensorResponseDTO getSensorDataLimit(String chipId);
 
     SensorResponseDTO getSensorDataByChipId(String chipId); // 해당 결과값을 바탕으로 ApexChart 에서 차트를 그려야 함
 
