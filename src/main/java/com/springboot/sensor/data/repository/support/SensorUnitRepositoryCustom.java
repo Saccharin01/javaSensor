@@ -1,5 +1,6 @@
 package com.springboot.sensor.data.repository.support;
 
+import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.entity.SensorUnit;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface SensorUnitRepositoryCustom {
 
     List<String> getSensorUnitIds();
 
+    SensorResponseDTO findSensorUnitWithDataByChipId(String chipId);
 }
