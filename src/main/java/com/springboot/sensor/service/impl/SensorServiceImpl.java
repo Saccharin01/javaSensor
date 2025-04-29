@@ -1,5 +1,8 @@
 package com.springboot.sensor.service.impl;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.springboot.sensor.data.dto.SensorUnitIdDTO;
+import com.springboot.sensor.data.entity.QSensorUnit;
 import com.springboot.sensor.data.entity.SensorData;
 import com.springboot.sensor.data.entity.SensorUnit;
 import org.springframework.stereotype.Service;
@@ -18,14 +21,17 @@ public class SensorServiceImpl implements SensorService {
 
     private final SensorDataRepository sensorDataRepository;
     private final SensorUnitRepository sensorUnitRepository;
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
     public SensorServiceImpl(
             SensorDataRepository sensorDataRepository,
-            SensorUnitRepository sensorUnitRepository)
+            SensorUnitRepository sensorUnitRepository,
+            JPAQueryFactory queryFactory)
     {
         this.sensorDataRepository = sensorDataRepository;
         this.sensorUnitRepository = sensorUnitRepository;
+        this.queryFactory = queryFactory;
     }
 
     @Override
@@ -59,6 +65,16 @@ public class SensorServiceImpl implements SensorService {
         data.setSensedTime(timestamp);
         return data;
     }
+    @Override
+    public List<SensorUnitIdDTO> getSensorUnitIds() {
+
+        return result.stream()
+                .map(unit -> new SensorUnitIdDTO(unit.getChipId()))
+                .toList();
+    }
+
+
+
 
     @Override
     public List<SensorRequestDTO>getSenseorData(){
