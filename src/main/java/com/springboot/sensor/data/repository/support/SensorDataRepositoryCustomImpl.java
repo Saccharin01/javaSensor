@@ -3,6 +3,7 @@ package com.springboot.sensor.data.repository.support;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.springboot.sensor.data.entity.SensorData;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import com.springboot.sensor.data.entity.QSensorData;
@@ -12,7 +13,8 @@ public class SensorDataRepositoryCustomImpl implements SensorDataRepositoryCusto
 
     private final JPAQueryFactory queryFactory;
 
-    public SensorDataRepositoryCustomImpl(EntityManager em) {
+    public SensorDataRepositoryCustomImpl(
+            @Qualifier("sensorEntityManager") EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
