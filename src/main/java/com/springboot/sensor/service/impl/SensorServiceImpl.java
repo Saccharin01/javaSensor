@@ -1,5 +1,6 @@
 package com.springboot.sensor.service.impl;
 
+import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.entity.SensorData;
 import com.springboot.sensor.data.entity.SensorUnit;
 import org.springframework.stereotype.Service;
@@ -66,9 +67,8 @@ public class SensorServiceImpl implements SensorService {
 
 
 
-    @Override
-    public List<SensorRequestDTO>getSenseorData(){
-        return null;
+    public SensorResponseDTO getSensorDataByChipId(String chipId) {
+        return sensorUnitRepository.findSensorUnitWithDataByChipId(chipId);
     }
 
 }

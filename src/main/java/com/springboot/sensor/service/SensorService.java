@@ -1,6 +1,7 @@
 package com.springboot.sensor.service;
 
 import com.springboot.sensor.data.dto.SensorRequestDTO;
+import com.springboot.sensor.data.dto.SensorResponseDTO;
 
 import java.util.List;
 
@@ -12,6 +13,6 @@ public interface SensorService {
     List<String>getSensorUnitIds();
 
 
-    List<SensorRequestDTO> getSenseorData(); // 해당 결과값을 바탕으로 ApexChart 에서 차트를 그려야 함
+    SensorResponseDTO getSensorDataByChipId(String chipId); // 해당 결과값을 바탕으로 ApexChart 에서 차트를 그려야 함
 
 }
