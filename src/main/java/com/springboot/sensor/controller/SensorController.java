@@ -22,8 +22,8 @@ public class SensorController {
 
 
     @Operation(
-            summary = "test",
-            description = "test"
+            summary = "센서 데이터를 전송하는 엔드포인트",
+            description = "센서에서 측정된 데이터를 데이터베이스에 전송하는 메서드입니다"
     )
     @PostMapping
     public ResponseEntity<SensorRequestDTO> getData(@RequestBody SensorRequestDTO requestDTO) {
