@@ -5,9 +5,14 @@ import com.springboot.sensor.data.dto.SensorDataDTO;
 import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.entity.QSensorData;
 import com.springboot.sensor.data.entity.QSensorUnit;
+import com.springboot.sensor.data.entity.SensorData;
+import com.springboot.sensor.data.entity.SensorUnit;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -15,6 +20,37 @@ import java.util.List;
 public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public SensorUnit findOrCreateSensorUnit(String chipId, String name, String location) {
+        QSensorUnit qSensorUnit = QSensorUnit.sensorUnit;
+
+        SensorUnit unit = queryFactory
+                .selectFrom(qSensorUnit)
+                .where(qSensorUnit.chipId.eq(chipId))
+                .fetchOne();
+
+        if (unit == null) {
+            unit = new SensorUnit();
+            unit.setChipId(chipId);
+            unit.setName(name);
+            unit.setLocation(location);
+            entityManager.persist(unit); // JPA 직접 사용
+        }
+
+        return unit;
+    }
+
+    @Override
+    public void saveSensorData(SensorUnit unit, int sensedData, LocalDateTime sensedTime) {
+        SensorData data = new SensorData();
+        data.setSensorUnit(unit);
+        data.setSensedData(sensedData);
+        data.setSensedTime(sensedTime);
+        entityManager.persist(data);
+    }
 
     @Override
     public List<String> getSensorUnitIds() {
