@@ -54,7 +54,7 @@ public class SensorController {
     )
     @GetMapping("/data")
     public ResponseEntity<SensorResponseDTO> getSensorData(@RequestParam String chipId) {
-        SensorResponseDTO response = sensorService.getSensorDataByChipId(chipId);
+        SensorResponseDTO response = sensorService.getSensorDataLimit(chipId);
         return ResponseEntity.ok(response);
     }
 }
