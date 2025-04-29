@@ -1,6 +1,7 @@
 package com.springboot.sensor.controller;
 
 import com.springboot.sensor.data.dto.SensorRequestDTO;
+import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.dto.SensorUnitIdDTO;
 import com.springboot.sensor.service.SensorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,5 +46,15 @@ public class SensorController {
         List<String> chipIds = sensorService.getSensorUnitIds();
 
         return ResponseEntity.ok(new SensorUnitIdDTO(chipIds));
+    }
+
+    @Operation(
+            summary = "특정 센서 유닛의 데이터를 가져오는 엔드포인트",
+            description = "쿼리스트링 chipId를 기반으로 센서 데이터를 조회합니다."
+    )
+    @GetMapping("/data")
+    public ResponseEntity<SensorResponseDTO> getSensorData(@RequestParam String chipId) {
+        SensorResponseDTO response = sensorService.getSensorDataByChipId(chipId);
+        return ResponseEntity.ok(response);
     }
 }
