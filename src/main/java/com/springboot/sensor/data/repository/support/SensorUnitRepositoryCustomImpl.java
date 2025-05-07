@@ -85,6 +85,7 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
                 unit.getChipId(),
                 unit.getName(),
                 unit.getLocation(),
+                unit.getSensorType(), 
                 dataList
         );
     }
@@ -122,6 +123,7 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
                 unit.getChipId(),
                 unit.getName(),
                 unit.getLocation(),
+                unit.getSensorType(),
                 dataList
         );
     }

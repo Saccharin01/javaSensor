@@ -26,6 +26,9 @@ public class SensorUnit {
     @Column
     private String location;
 
+    @Column(name = "sensor_type")
+    private String sensorType;
+
     @OneToMany(mappedBy = "sensorUnit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SensorData> dataList = new ArrayList<>();
 
