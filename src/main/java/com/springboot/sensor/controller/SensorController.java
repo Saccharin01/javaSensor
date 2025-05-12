@@ -49,8 +49,8 @@ public class SensorController {
     }
 
     @Operation(
-            summary = "특정 센서 유닛의 데이터를 가져오는 엔드포인트",
-            description = "쿼리스트링 chipId를 기반으로 센서 데이터를 조회합니다."
+            summary = "최초 유닛 데이터를 제공하는 엔드포인트.",
+            description = "최초 사용자가 페이지와 인터렉션 시 가장 최근의 데이터 50개를 가져올 수 있도록 합니다. 이 떄 기본 데이터는 50개만 제공됩니다."
     )
     @GetMapping("/units/basic")
     public ResponseEntity<SensorResponseDTO> getSensorDataBasic(@RequestParam String chipId) {
@@ -58,6 +58,10 @@ public class SensorController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "검색 조건을 수행하는 엔드포인트.",
+            description = "사용자의 검색 요구 조건에 따라 검색 조건을 수행하여 응답하는 엔드포인트입니다."
+    )
 
     @GetMapping("/units/search")
     public ResponseEntity<SensorResponseDTO> getSensorDataSearched (
