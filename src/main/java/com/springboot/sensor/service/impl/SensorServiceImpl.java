@@ -52,6 +52,11 @@ public class SensorServiceImpl implements SensorService {
         return sensorUnitRepository.findSensorDataLimit(chipId, 50);
     }
 
+    @Override
+    public SensorResponseDTO getSensorDataWithQuery(String chipId, String type, String selectedDate, String direction, Integer count) {
+        return sensorUnitRepository.findSensorDataByConditions(chipId, type, selectedDate, direction, count);
+    }
+
     //센서 id 에 해당하는 모든 데이터를 반환하도록 되어있는데 추후 사용 가능성 있음
     public SensorResponseDTO getSensorDataByChipId(String chipId) {
         return sensorUnitRepository.findSensorUnitWithDataByChipId(chipId);

@@ -16,4 +16,5 @@ public interface SensorService {
 
     SensorResponseDTO getSensorDataByChipId(String chipId); // 해당 결과값을 바탕으로 ApexChart 에서 차트를 그려야 함
 
+    SensorResponseDTO getSensorDataWithQuery(String chipId, String type, String selectedDate, String direction, Integer count);
 }
