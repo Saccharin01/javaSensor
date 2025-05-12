@@ -50,7 +50,7 @@ public class SensorController {
 
     @Operation(
             summary = "최초 유닛 데이터를 제공하는 엔드포인트.",
-            description = "최초 사용자가 페이지와 인터렉션 시 가장 최근의 데이터 50개를 가져올 수 있도록 합니다. 이 떄 기본 데이터는 50개만 제공됩니다."
+            description = "최초 사용자가 페이지와 인터렉션 시 가장 최근의 데이터 50개를 가져올 수 있도록 합니다."
     )
     @GetMapping("/units/basic")
     public ResponseEntity<SensorResponseDTO> getSensorDataBasic(@RequestParam String chipId) {
