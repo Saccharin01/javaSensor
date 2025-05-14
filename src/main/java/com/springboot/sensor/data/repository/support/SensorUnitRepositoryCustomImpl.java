@@ -144,43 +144,62 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
         QSensorUnit sensorUnit = QSensorUnit.sensorUnit;
         QSensorData sensorData = QSensorData.sensorData;
 
-        // 기준 시간 파싱
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime selectedDate = LocalDateTime.parse(selectedDateStr, formatter);
 
-        // 유닛 조회
         SensorUnit unit = queryFactory
                 .selectFrom(sensorUnit)
                 .where(sensorUnit.chipId.eq(chipId))
                 .fetchOne();
 
-        if (unit == null) throw new IllegalArgumentException("chipId not found");
-
-        // ❸ 조건 조립
-        BooleanExpression baseCondition = sensorData.sensorUnit.eq(unit);
-
-        BooleanExpression timeCondition = null;
-        switch (type) {
-            case "hour" -> timeCondition = direction.equals("before")
-                    ? sensorData.sensedTime.loe(selectedDate)
-                    : sensorData.sensedTime.goe(selectedDate);
-            case "day" -> timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear())
-                    .and(sensorData.sensedTime.month().eq(selectedDate.getMonthValue()))
-                    .and(sensorData.sensedTime.dayOfMonth().eq(selectedDate.getDayOfMonth()));
-            case "month" -> timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear())
-                    .and(sensorData.sensedTime.month().eq(selectedDate.getMonthValue()));
-            case "year" -> timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear());
+        if (unit == null) {
+            throw new IllegalArgumentException("chipId not found");
         }
 
-        // 최종 쿼리 실행
+        BooleanExpression baseCondition = sensorData.sensorUnit.eq(unit);
+        BooleanExpression timeCondition;
+
+        switch (type) {
+            case "hour" -> {
+                if (direction == null) {
+                    throw new IllegalArgumentException("hour 타입에는 direction 값이 필요합니다.");
+                }
+                timeCondition = direction.equals("before")
+                        ? sensorData.sensedTime.loe(selectedDate)
+                        : sensorData.sensedTime.goe(selectedDate);
+            }
+
+            case "day" -> {
+                timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear())
+                        .and(sensorData.sensedTime.month().eq(selectedDate.getMonthValue()))
+                        .and(sensorData.sensedTime.dayOfMonth().eq(selectedDate.getDayOfMonth()));
+            }
+
+            case "month" -> {
+                timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear())
+                        .and(sensorData.sensedTime.month().eq(selectedDate.getMonthValue()));
+            }
+
+            case "year" -> {
+                timeCondition = sensorData.sensedTime.year().eq(selectedDate.getYear());
+            }
+
+            default -> throw new IllegalArgumentException("지원하지 않는 type: " + type);
+        }
+
+        // direction이 있는 경우 정렬 기준 분기
+        boolean hasDirection = List.of("hour", "day", "month", "year").contains(type) && direction != null;
+        var orderSpecifier = (hasDirection && direction.equals("after"))
+                ? sensorData.sensedTime.asc()
+                : sensorData.sensedTime.desc();
+
         List<SensorData> filtered = queryFactory
                 .selectFrom(sensorData)
                 .where(baseCondition.and(timeCondition))
-                .orderBy(sensorData.sensedTime.desc())
+                .orderBy(orderSpecifier)
                 .limit(count != null ? count : 50)
                 .fetch();
 
-        // DTO 반환
         List<SensorDataDTO> dataList = filtered.stream()
                 .map(d -> new SensorDataDTO(d.getSensedData(), d.getSensedTime()))
                 .toList();
