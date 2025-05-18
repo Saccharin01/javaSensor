@@ -1,6 +1,8 @@
 package com.springboot.sensor.data.repository.support;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.springboot.sensor.data.dto.AggregatedDataDTO;
 import com.springboot.sensor.data.dto.SensorDataDTO;
 import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.entity.QSensorData;
@@ -12,9 +14,13 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 @Repository
@@ -24,6 +30,9 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
     private final JPAQueryFactory queryFactory;
     @PersistenceContext
     private EntityManager entityManager;
+
+    private final QSensorData data = QSensorData.sensorData;
+    private final QSensorUnit unit = QSensorUnit.sensorUnit;
 
     @Override
     public SensorUnit findOrCreateSensorUnit(String chipId, String name, String location) {
@@ -212,4 +221,154 @@ public class SensorUnitRepositoryCustomImpl implements SensorUnitRepositoryCusto
                 dataList
         );
     }
+
+    @Override
+    public List<AggregatedDataDTO> getMonthlyAveragesByYear(String chipId, int year) {
+
+        List<Tuple> result = queryFactory
+                .select(
+                        data.sensedTime.month().as("month"),
+                        data.sensedData.avg(),
+                        data.sensedData.count()
+                )
+                .from(data)
+                .join(data.sensorUnit, unit)
+                .where(
+                        unit.chipId.eq(chipId),
+                        data.sensedTime.year().eq(year)
+                )
+                .groupBy(data.sensedTime.month())
+                .orderBy(data.sensedTime.month().asc())
+                .fetch();
+
+        return result.stream()
+                .map(tuple -> new AggregatedDataDTO(
+                        tuple.get(0, Integer.class) + "월",
+                        tuple.get(1, Double.class),
+                        tuple.get(2, Long.class)
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<AggregatedDataDTO> getWeeklyAvgByMonth(String chipId, int year, int month) {
+        List<Tuple> result = queryFactory
+                .select(
+                        data.sensedTime.week(),
+                        data.sensedData.avg(),
+                        data.sensedData.count()
+                )
+                .from(data)
+                .join(data.sensorUnit, unit)
+                .where(
+                        unit.chipId.eq(chipId),
+                        data.sensedTime.year().eq(year),
+                        data.sensedTime.month().eq(month)
+                )
+                .groupBy(data.sensedTime.week())
+                .orderBy(data.sensedTime.week().asc())
+                .fetch();
+
+        AtomicInteger weekIndex = new AtomicInteger(1); // 상대 주차 인덱스: 1주차부터
+
+        return result.stream()
+                .map(tuple -> {
+                    Double avg = tuple.get(data.sensedData.avg());
+                    Long count = tuple.get(data.sensedData.count());
+
+                    String label = String.format("%d월 %d주차", month, weekIndex.getAndIncrement());
+                    return new AggregatedDataDTO(label, avg, count);
+                })
+                .toList();
+    }
+
+    @Override
+    public List<AggregatedDataDTO> getDailyAvgByWeek(String chipId, int year, int month, int week) {
+        QSensorUnit unit = QSensorUnit.sensorUnit;
+        QSensorData data = QSensorData.sensorData;
+
+        // 주차 계산: 월 첫째 주 기준 해당 주차의 날짜 범위 계산
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        LocalDate weekStart = firstDay.plusWeeks(week - 1);
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        BooleanExpression condition = unit.chipId.eq(chipId)
+                .and(data.sensedTime.between(weekStart.atStartOfDay(), weekEnd.atTime(23, 59, 59)));
+
+        return queryFactory
+                .select(
+                        data.sensedTime.dayOfMonth(),
+                        data.sensedData.avg(),
+                        data.sensedData.count()
+                )
+                .from(data)
+                .join(data.sensorUnit, unit)
+                .where(condition)
+                .groupBy(data.sensedTime.dayOfMonth())
+                .orderBy(data.sensedTime.dayOfMonth().asc())
+                .fetch()
+                .stream()
+                .map(tuple -> new AggregatedDataDTO(
+                        tuple.get(data.sensedTime.dayOfMonth()) + "일",
+                        tuple.get(data.sensedData.avg()),
+                        tuple.get(data.sensedData.count())
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<AggregatedDataDTO> getHourlyAvgByDay(String chipId, int year, int month, int day) {
+        List<Tuple> result = queryFactory
+                .select(
+                        data.sensedTime.hour(),
+                        data.sensedData.avg(),
+                        data.sensedData.count()
+                )
+                .from(data)
+                .join(data.sensorUnit, unit)
+                .where(
+                        unit.chipId.eq(chipId),
+                        data.sensedTime.year().eq(year),
+                        data.sensedTime.month().eq(month),
+                        data.sensedTime.dayOfMonth().eq(day)
+                )
+                .groupBy(data.sensedTime.hour())
+                .orderBy(data.sensedTime.hour().asc())
+                .fetch();
+
+        return result.stream()
+                .map(tuple -> new AggregatedDataDTO(
+                        tuple.get(0, Integer.class) + "시",
+                        tuple.get(1, Double.class),
+                        tuple.get(2, Long.class)
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<AggregatedDataDTO> getRawDataByHour(String chipId, LocalDateTime dateTime) {
+        List<SensorData> result = queryFactory
+                .selectFrom(data)
+                .join(data.sensorUnit, unit).fetchJoin()
+                .where(
+                        unit.chipId.eq(chipId),
+                        data.sensedTime.year().eq(dateTime.getYear()),
+                        data.sensedTime.month().eq(dateTime.getMonthValue()),
+                        data.sensedTime.dayOfMonth().eq(dateTime.getDayOfMonth()),
+                        data.sensedTime.hour().eq(dateTime.getHour())
+                )
+                .orderBy(data.sensedTime.asc())
+                .fetch();
+
+        return result.stream()
+                .map(d -> new AggregatedDataDTO(
+                        d.getSensedTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        (double) d.getSensedData(),
+                        1L
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+
 }
