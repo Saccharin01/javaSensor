@@ -1,5 +1,6 @@
 package com.springboot.sensor.controller;
 
+import com.springboot.sensor.data.dto.AggregatedDataDTO;
 import com.springboot.sensor.data.dto.SensorRequestDTO;
 import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.dto.SensorUnitIdDTO;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -73,5 +76,26 @@ public class SensorController {
     ){
         SensorResponseDTO response = sensorService.getSensorDataWithQuery(chipId, type, selectedDate, direction, count);
         return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/units/aggregate/monthly")
+    public ResponseEntity<List<AggregatedDataDTO>> getMonthlyAverages(
+            @RequestParam String chipId,
+            @RequestParam int year
+    ) {
+        List<AggregatedDataDTO> response = sensorService.getMonthlyAveragesByYear(chipId, year);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/units/aggregate")
+    public ResponseEntity<List<AggregatedDataDTO>> getAggregatedData(
+            @RequestParam String chipId,
+            @RequestParam String type,
+            @RequestParam String selectedDate // yyyy-MM-dd HH:mm:ss 형식
+    ) {
+        LocalDateTime parsedDate = LocalDateTime.parse(selectedDate, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        List<AggregatedDataDTO> data = sensorService.getAggregatedData(chipId, type, parsedDate);
+        return ResponseEntity.ok(data);
     }
 }
