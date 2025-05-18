@@ -1,5 +1,6 @@
 package com.springboot.sensor.service.impl;
 
+import com.springboot.sensor.data.dto.AggregatedDataDTO;
 import com.springboot.sensor.data.dto.SensorResponseDTO;
 import com.springboot.sensor.data.entity.SensorUnit;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import com.springboot.sensor.data.dto.SensorRequestDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.List;
 
 
@@ -67,5 +69,19 @@ public class SensorServiceImpl implements SensorService {
         return sensorUnitRepository.getSensorUnitIds();
     }
 
+    public List<AggregatedDataDTO> getMonthlyAveragesByYear(String chipId, int year) {
+        return sensorUnitRepository.getMonthlyAveragesByYear(chipId, year);
+    }
+
+    public List<AggregatedDataDTO> getAggregatedData(String chipId, String type, LocalDateTime selectedDate) {
+        return switch (type) {
+            case "year" -> sensorUnitRepository.getMonthlyAveragesByYear(chipId, selectedDate.getYear());
+            case "month" -> sensorUnitRepository.getWeeklyAvgByMonth(chipId, selectedDate.getYear(), selectedDate.getMonthValue());
+            case "week" -> sensorUnitRepository.getDailyAvgByWeek(chipId, selectedDate.getYear(), selectedDate.getMonthValue(), selectedDate.get(ChronoField.ALIGNED_WEEK_OF_MONTH));
+            case "day" -> sensorUnitRepository.getHourlyAvgByDay(chipId, selectedDate.getYear(), selectedDate.getMonthValue(), selectedDate.getDayOfMonth());
+            case "hour" -> sensorUnitRepository.getRawDataByHour(chipId, selectedDate);
+            default -> throw new IllegalArgumentException("지원하지 않는 타입입니다: " + type);
+        };
+    }
 
 }
